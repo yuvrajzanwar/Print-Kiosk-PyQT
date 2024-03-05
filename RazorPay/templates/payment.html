@@ -1,0 +1,107 @@
+<!-- <button style="display:flex;justify-content:center;align-items:center"  id="rzp-button1">Pay</button>
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+var options = {
+    "key": "rzp_test_0eGEDnUNnnWiGh", // Enter the Key ID generated from the Dashboard
+    "name": "Print Kiosk", //your business name
+    "description": "Kindly proceed to pay",
+    "image": "https://example.com/your_logo",
+    "order_id": "{{order_id}}", //This is a sample Order ID. Pass the `id` obtained in the response of Step 1
+    "handler": function (response){
+      console.log(
+        {
+          razorpay_payment_id:response.razorpay_payment_id,
+          razorpay_order_id:response.razorpay_order_id,
+          razorpay_signature:response.razorpay_signature
+        }
+      );
+       
+    },
+    
+    "theme": {
+        "color": "#3399cc"
+    }
+};
+var rzp1 = new Razorpay(options);
+rzp1.on('payment.failed', function (response){
+        alert(response.error.code);
+        alert(response.error.description);
+        alert(response.error.source);
+        alert(response.error.step);
+        alert(response.error.reason);
+        alert(response.error.metadata.order_id);
+        alert(response.error.metadata.payment_id);
+});
+document.getElementById('rzp-button1').onclick = function(e){
+    rzp1.open();
+    e.preventDefault();
+}
+
+</script>
+ -->
+
+ <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Page</title>
+</head>
+<body>
+    <h1>Click on Pay to Proceed</h1>
+    <button style="display:flex;justify-content:center;align-items:center"  id="rzp-button1">Pay</button>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <script>
+        var order_id = "{{ order_id }}"; // This will be replaced by the actual order ID passed from Flask
+        
+        var options = {
+            "key": "rzp_test_0eGEDnUNnnWiGh", // Enter the Key ID generated from the Dashboard
+            "name": "Print Kiosk", //your business name
+            "description": "Kindly proceed to pay",
+            "image": "https://example.com/your_logo",
+            "order_id": order_id, // Pass the order_id variable here
+            "handler": function (response){
+                console.log({
+                    razorpay_payment_id: response.razorpay_payment_id,
+                    razorpay_order_id: response.razorpay_order_id,
+                    razorpay_signature: response.razorpay_signature
+                });
+                // Send payment details to Flask
+                sendPaymentDetails(response);
+            },
+            "theme": {
+                "color": "#3399cc"
+            }
+        };
+
+        var rzp1 = new Razorpay(options);
+
+        rzp1.on('payment.failed', function (response){
+            
+        });
+
+        document.getElementById('rzp-button1').onclick = function(e){
+            rzp1.open();
+            e.preventDefault();
+        }
+
+        function sendPaymentDetails(response) {
+            // Send payment details to Flask using AJAX
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", "/verify", true);
+            xhr.setRequestHeader("Content-Type", "application/json");
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
+                    console.log("Payment details sent successfully!");
+                }
+            };
+            var data = JSON.stringify({
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_order_id: response.razorpay_order_id,
+                razorpay_signature: response.razorpay_signature
+            });
+            xhr.send(data);
+        }
+    </script>
+</body>
+</html>
