@@ -16,7 +16,7 @@ class DocToPdfConverter:
 
     def convert_to_pdf(self, input_path, output_path):
         try:
-            subprocess.run(["libreoffice", "--headless", "--convert-to", "pdf", "--outdir", os.path.dirname(output_path), input_path])
+            subprocess.run(["libreoffice", "--headless", "--convert-to", "pdf", "--outdir", os.path.dirname(output_path), input_path], stderr=subprocess.DEVNULL)
             print(f"Converted {input_path} to {output_path}")
         except Exception as e:
             print(f"Error converting {input_path} to PDF: {e}")
@@ -27,4 +27,5 @@ def main():
 
 if __name__ == '__main__':
     main()
+
 
